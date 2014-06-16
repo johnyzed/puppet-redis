@@ -19,7 +19,7 @@
 
 This module installs and makes basic configs for multiple redis instances on
 the same node. It installs redis from source. (http://redis.io/)
-It also can configure the monitoring server Sentinel.
+It also can configure the monitoring server Sentinel or create a master/slave architecture.
 
 ##Setup
 
@@ -85,7 +85,45 @@ node 'redis.my.domain' {
   }
 }
 ```
+###Setting up a Matser Slave architecture
 
+You can create a Redis Master Slave architecture.
+
+```puppet
+node 'redis.my.domain' {
+
+  # install latest stable build.
+  class { 'redis::install': }
+
+  redis::server {
+    'master':
+      redis_memory    => '1g',
+      redis_ip        => '0.0.0.1',
+      redis_port      => 6379,
+      redis_mempolicy => 'allkeys-lru',
+      redis_timeout   => 0,
+      redis_nr_dbs    => 16,
+      redis_loglevel  => 'notice',
+      running         => true,
+      enabled         => true
+  }
+
+  redis::server {
+    'slave':
+      redis_memory    => '112m',
+      redis_ip        => '0.0.0.2',
+      redis_port      => 6379,
+      redis_mempolicy => 'allkeys-lru',
+      redis_timeout   => 0,
+      redis_nr_dbs    => 2,
+      redis_loglevel  => 'info',
+      redis_is_slave  => true,
+      redis_master_IP_for_slave => '0.0.0.1',
+      running         => true,
+      enabled         => true
+  }
+}
+```
 ###Setting up sentinel with two monitors
 
 You can create multiple sentinels on one node. But most of the time you will
