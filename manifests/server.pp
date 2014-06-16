@@ -26,6 +26,12 @@
 #   Path for log. Full log path is <redis_log_dir>/redis_<redis_name>.log. Default: /var/log
 # [*redis_loglevel*]
 #   Loglevel of Redis. Default: notice
+# [*redis_is_slave*]
+#   Define is the redis server is a slave. Default: false
+# [*redis_master_IP_for_slave*]
+#   The master server IP the slave will be linked to. Default: 127.0.0.1
+# [*redis_master_port_for_slave*]
+#   The master server port the slave will be linked to. Default: 6379
 # [*running*]
 #   Configure if Redis should be running or not. Default: true
 # [*enabled*]
@@ -44,6 +50,9 @@ define redis::server (
   $redis_log_dir    = '/var/log',
   $redis_loglevel   = 'notice',
   $redis_appedfsync = 'everysec',
+  $redis_is_slave   = false,
+  $redis_master_IP_for_slave = '127.0.0.1',
+  $redis_master_port_for_slave = 6379,
   $running          = true,
   $enabled          = true
 ) {
@@ -60,7 +69,8 @@ define redis::server (
     "/etc/redis_${redis_name}.conf":
       ensure  => file,
       content => template('redis/etc/redis.conf.erb'),
-      require => Class['redis::install'];
+      require => Class['redis::install'],
+      notify  => Service["redis-server_${redis_name}"],
   }
 
   # startup script
