@@ -39,7 +39,6 @@
 #
 define redis::server (
   $redis_name       = $name,
-  $redis_memory     = '100mb',
   $redis_ip         = '127.0.0.1',
   $redis_port       = 6379,
   $redis_mempolicy  = 'allkeys-lru',
@@ -56,6 +55,14 @@ define redis::server (
   $running          = true,
   $enabled          = true
 ) {
+
+  if $memorysize_mb < 1000 {
+    $redis_memory = "700mb"
+  }else {
+    $redis_memory_num = $memorysize_mb*0.9
+    $redis_memory = "${redis_memory_num}mb"
+  }
+
 
   $redis_install_dir = $::redis::install::redis_install_dir
   $redis_init_script = $::operatingsystem ? {
