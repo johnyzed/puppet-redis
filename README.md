@@ -1,5 +1,9 @@
 #redis
 
+####Requisits
+In order to compute dynamically the memory usage of the redis server, this module uses a custom fact called "memorysize_mb".
+Such a file can be create using a custun fact script like [this one](https://gist.github.com/johnyzed/8bed34f99667ace51016) .
+
 ####Table of Contents
 
 1. [Overview - What is the graphite module?](#overview)
